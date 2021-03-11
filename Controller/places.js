@@ -1,4 +1,5 @@
 const uuid=require('uuid')
+const httpError=require("../Models/http-error")
 let DUMMY_PLACES=[
     {
         id:'p1',
@@ -12,7 +13,7 @@ let DUMMY_PLACES=[
         creator:'u1'
     },
     {
-        id:uuid,
+        id:'p2',
         title:"London",
         description:'Good Place',
         location:{
@@ -26,8 +27,7 @@ let DUMMY_PLACES=[
 
 const getAllPlaces=(req,res,next)=>{
     if(DUMMY_PLACES.length==0){
-        const error=new Error("Could Find Place")
-        error.code=401
+        const error=new httpError("Could Find Place",401)
         return next(error)
     }
     res.status(200).json({
@@ -40,8 +40,7 @@ const getPlaceByUser=(req,res,next)=>{
     console.log(id)
     const identifiedPlace=DUMMY_PLACES.filter(place=>place.creator==id)
     if(!identifiedPlace || identifiedPlace.length==0){
-        const error=new Error("Couldn't Find Place for that User")
-        error.code=401
+        const error=new httpError("Couldn't Find Place for that User",401)
         return next(error)
     }
     res.status(200).json({
@@ -54,15 +53,13 @@ const getParticularPlace=(req,res,next)=>{
     console.log(id)
     const identifiedPlace=DUMMY_PLACES.find(place=>place.id===id)
     if(!identifiedPlace){
-        const error=new Error("Could Find Place")
-        error.code=401
+        const error=new httpError("Could Find Place",401)
         return next(error)
     }
     res.status(200).json({
         place:identifiedPlace
     })
 }
-
 
 const createPlace=(req,res,next)=>{
     const {title,description,cordinates,creator}=req.body

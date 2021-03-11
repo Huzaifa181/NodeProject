@@ -1,17 +1,22 @@
 const express= require("express");
-const {getAllPlaces}=require('../Controller/places')
-const {getParticularPlace}=require('../Controller/places')
-const {getPlaceByUser}=require('../Controller/places')
-const {createPlace}=require('../Controller/places')
-// const app=express()
+const placeRoutes=require('../Controller/places')
+const {check}= require("express-validator");
 
 const route=express.Router();
 
-
-route.get('/',getAllPlaces)
-route.get('/:pid',getParticularPlace)
-route.get('/user/:uid',getPlaceByUser)
-route.post('/',createPlace)
+route.get('/',placeRoutes.getAllPlaces)
+route.get('/:pid',placeRoutes.getParticularPlace)
+route.get('/user/:uid',placeRoutes.getPlaceByUser)
+route.post('/',[
+    check('title').
+    not().
+    isEmpty(),
+    check('description').
+    isLength({min:5}),
+    check('address').
+    not().
+    isEmpty(),
+],placeRoutes.createPlace)
 
 
 module.exports=route
