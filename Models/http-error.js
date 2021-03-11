@@ -1,0 +1,3 @@
+class httpError extends Error{
+    
+}
