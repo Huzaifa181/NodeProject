@@ -6,6 +6,7 @@ const route=express.Router();
 
 route.get('/',placeRoutes.getAllPlaces)
 route.get('/:pid',placeRoutes.getParticularPlace)
+route.patch('/:pid',placeRoutes.updateParticularPlace)
 route.get('/user/:uid',placeRoutes.getPlaceByUser)
 route.post('/',[
     check('title').
@@ -17,6 +18,5 @@ route.post('/',[
     not().
     isEmpty(),
 ],placeRoutes.createPlace)
-
 
 module.exports=route
