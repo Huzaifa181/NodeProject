@@ -15,6 +15,7 @@ app.use((req,res,next)=>{
 })
 
 app.use((error,req,res,next)=>{
+    console.log("Hhh")
     if(res.headerSent){
         next(error)
     }
@@ -23,5 +24,4 @@ app.use((error,req,res,next)=>{
         message:error.message || "Some thing Wrong"}
     )
 })
-
 app.listen(5000)

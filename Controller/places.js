@@ -1,6 +1,7 @@
-const uuid=require('uuid')
+const  MongoClient  = require("mongodb").MongoClient
 const httpError=require("../Models/http-error")
 const {validationResult}=require("express-validator")
+var url="mongodb+srv://Huzaifa:Hanzala12@cluster0.n82wf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 let DUMMY_PLACES=[
     {
         id:'p1',
@@ -26,15 +27,6 @@ let DUMMY_PLACES=[
     },
 ]
 
-const getAllPlaces=(req,res,next)=>{
-    if(DUMMY_PLACES.length==0){
-        const error=new httpError("Couldn't Find Place",401)
-        return next(error)
-    }
-    res.status(200).json({
-        place:DUMMY_PLACES
-    })
-}
 
 const getPlaceByUser=(req,res,next)=>{
     const id=req.params.uid
@@ -62,22 +54,55 @@ const getParticularPlace=(req,res,next)=>{
     })
 }
 
-const createPlace=(req,res,next)=>{
+const getAllPlaces=async (req,res,next)=>{
+    const client= new MongoClient(url,{ useUnifiedTopology: true });
+    try{
+        console.log("jsss")
+        await client.connect();
+        console.log("jss")
+        const db= client.db();
+        console.log("js")
+        result=await db.collection("myFirstDatabase").find().toArray();
+        console.log(result)
+    }
+    catch(error){
+        return res.json(({message:"could not store data"}))
+    }
+    client.close();
+    if(DUMMY_PLACES.length==0){
+        const error=new httpError("Couldn't Find Place",401)
+        return next(error)
+    }
+    res.status(200).json(result)
+}
+const createPlace=async (req,res,next)=>{
     const error=validationResult(req)
     if(!error.isEmpty()){
-        throw new httpError("Invalid Input Passed, Please Check your Data",422)
+        const error= new httpError("Invalid Input Passed, Please Check your Data",422)
+        return next(error)
     }
-    const {title,description,cordinates,creator}=req.body
     const NEW_PLACE={
-        id:uuid(),
-        title,
-        description,
-        location,
-        cordinates,
-        address,
-        creator
+        title:req.body.title,
+        description:req.body.description,
+        cordinates:req.body.cordinates,
+        address:req.body.address,
+        creator:req.body.creator
     }
-    DUMMY_PLACES.push(NEW_PLACE)
+    
+    const client= new MongoClient(url)
+    try{
+        console.log("jjjhjs")
+        await client.connect();
+        const db= client.db();
+        console.log("jhjs")
+        const result=await db.collection("myFirstDatabase").insertOne(NEW_PLACE);
+        console.log("sam")
+    }
+    catch (error){
+        console.log("jk")
+        return res.json(({message:"could not store data "}))
+    }
+    client.close();
     res.status(200).json({
         message:"Place create successfully",
         place:NEW_PLACE
