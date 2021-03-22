@@ -9,7 +9,7 @@ route.get('/:pid',placeRoutes.getParticularPlace)
 route.patch('/:pid',placeRoutes.updateParticularPlace)
 route.get('/user/:uid',placeRoutes.getPlaceByUser)
 route.post('/',[
-    check('title').
+    check('title').  
     not().
     isEmpty(),
     check('description').

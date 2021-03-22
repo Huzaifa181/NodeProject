@@ -1,8 +1,11 @@
+const connectDb=require('./config/db')
 const express= require("express");
 const bodyParser= require("body-parser");
-const placeRoutes= require("./Routes/place-routes");
 const userRoutes= require("./Routes/user-routes");
+const placeRoutes= require("./Routes/place-routes");
 const httpError = require("./Models/http-error");
+
+connectDb();
 
 const app=express();
 
