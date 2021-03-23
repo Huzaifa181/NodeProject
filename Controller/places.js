@@ -1,6 +1,8 @@
 const httpError=require("../Models/http-error")
 const Place=require('../Models/places')
 const {validationResult}=require("express-validator")
+const User=require('../Models/users')
+const mongoose=require('mongoose')
 
 const getPlaceByUser=async (req,res,next)=>{
     const id=req.params.uid
@@ -62,35 +64,58 @@ const getAllPlaces=async (req,res,next)=>{
 
 const createPlace=async (req,res,next)=>{
     const error=validationResult(req)
+    const {title,description,image,address,location,creator}=req.body
     if(!error.isEmpty()){
         const error= new httpError("Invalid Input Passed, Please Check your Data",422)
         return next(error)
     }
-
+    const createPlace=new Place({
+        title:title,
+        description:description,
+        location:location,
+        image:"https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.shutterstock.com%2Fsearch%2Fnature&psig=AOvVaw2UPOioHspiliguPXwy1UXd&ust=1616558351570000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCNjW6aTDxe8CFQAAAAAdAAAAABAD",
+        address:address,
+        creator:creator
+    })
+    let user
     try{
-        const createProduct=await new Place({
-            title:req.body.title,
-            description:req.body.description,
-            location:req.body.location,
-            image:"https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.shutterstock.com%2Fsearch%2Fnature&psig=AOvVaw2UPOioHspiliguPXwy1UXd&ust=1616558351570000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCNjW6aTDxe8CFQAAAAAdAAAAABAD",
-            address:req.body.address,
-            creator:req.body.creator
-        })
-        const result=await createProduct.save()
+        user=await User.findById(creator)
+    }
+    catch(err){
+        console.log(err)
+        const error= new httpError("Creating Place Failed, Please Try again later",500)
+        return next(error)
+    }
+    if(!user){
+        const error= new httpError("Could Found User for That ID",500)
+        return next(error)
+    }
+    try{
+        const sess=await mongoose.startSession();
+        await sess.startTransaction();
+        await createPlace.save({session:sess});
+        user.places.push(createPlace);
+        await user.save({session:sess});
+        sess.commitTransaction();
     }
     catch (err){
-        const error=new httpError("Could not store data",500)
+        console.log(err)
+        const error=new httpError("Creating Placess failed, Please Try Again Later",500)
         return next(error)
     }
     res.status(200)
     res.json({
         message:'Place Create Successfully',
-        data:result
+        data:createPlace
     })
 }
-
 const updateParticularPlace=async (req,res,next)=>{
     const {title, description}=req.body
+    const error=validationResult(req)
+    if(!error.isEmpty()){
+        const error= new httpError("Invalid Input Passed, Please Check your Data",422)
+        return next(error)
+    }
     const pid=req.params.pid
     let place;
     try{
@@ -107,6 +132,7 @@ const updateParticularPlace=async (req,res,next)=>{
         place=await place.save();
     }
     catch(err){
+        console.log(err)
         const error=new httpError("Something went wrong, Could not Update place",500)
         return next(error)
     }
@@ -116,7 +142,6 @@ const updateParticularPlace=async (req,res,next)=>{
     })
 }
 const deleteParticularPlace=async (req,res,next)=>{
-    const {title, description}=req.body
     const pid=req.params.pid
     let place;
     try{
@@ -126,8 +151,7 @@ const deleteParticularPlace=async (req,res,next)=>{
         const error=new httpError("Could not Find Places",500)
         return next(error)
     }
-    place.title=title
-    place.description=description
+
     try{
         console.log(place);
         place=await place.remove();

@@ -15,6 +15,9 @@ route.post('/signup',
             check('password').
             not().
             isEmpty(),
+            check('image').
+            not().
+            isEmpty(),
         ],userRoutes.signUp)
 route.post('/login',
 [
