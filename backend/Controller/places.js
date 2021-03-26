@@ -30,7 +30,7 @@ const getParticularPlace=async (req,res,next)=>{
         identifiedPlace=await Place.findById(id)
     }
     catch(err){
-        const error=new httpError("Spmething went wrong, Could not Find Place",500)
+        const error=new httpError("Something went wrong, Could not Find Place",500)
         return next(error)
     }
     if(!identifiedPlace){
@@ -145,19 +145,28 @@ const deleteParticularPlace=async (req,res,next)=>{
     const pid=req.params.pid
     let place;
     try{
-        place=await Place.findById(pid)
+        place=await Place.findById(pid).populate('creator')
     }
     catch(err){
+        const error=new httpError("Error in Deleting a Place",500)
+        return next(error)
+    }
+    if(!place){
         const error=new httpError("Could not Find Places",500)
         return next(error)
     }
-
     try{
         console.log(place);
-        place=await place.remove();
+        const sess=await mongoose.startSession();
+        await sess.startTransaction();
+        await place.remove({session:sess});
+        place.creator.places.pull(place);
+        await place.creator.save({session:sess});
+        await sess.commitTransaction();
     }
     catch(err){
-        const error=new httpError("Something went wrong, Could not Update place",500)
+        console.log(err)
+        const error=new httpError("Something went wrong, Could not Delete place",500)
         return next(error)
     }
     res.status(200).json({
