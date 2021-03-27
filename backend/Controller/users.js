@@ -24,6 +24,7 @@ const getAllUsers=async (req,res,next)=>{
 
 const signUp=async (req,res,next)=>{
     const {name,email,password}=req.body
+    console.log(name,email,password)
     let hasUser;
     try{
         hasUser=await Users.findOne({email:email})
@@ -60,6 +61,7 @@ const login=async (req,res,next)=>{
     const {email,password}=req.body
     const error=validationResult(req)
     if(!error){
+        console.log("error")
         const error=new httpError("Input the Correct Fields",400)
         return next(error)
     }
@@ -68,14 +70,17 @@ const login=async (req,res,next)=>{
         existingUser=await Users.findOne({email:email})
     }
     catch(err){
+        console.log("error")
         const error=new httpError("Logging In Failed, Please Try Again Later",500)
         return next(error)
     }
     if(!existingUser){
+        console.log("error")
         const error=new httpError("User Doesn't Exist")
         return next(error)
     }
     if(password!==existingUser.password){
+        console.log("error")
         const error=new httpError("Invalid Password")
         return next(error)
     }

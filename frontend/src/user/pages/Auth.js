@@ -19,7 +19,7 @@ const Auth = () => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-
+console.log("jkk")
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -60,7 +60,7 @@ const Auth = () => {
 
   const authSubmitHandler = async event => {
     event.preventDefault();
-
+    console.log(event)
     if (isLoginMode) {
       try {
         const responseData = await sendRequest(
@@ -74,8 +74,15 @@ const Auth = () => {
             'Content-Type': 'application/json'
           }
         );
-        auth.login(responseData.user.id);
-      } catch (err) {}
+        auth.login(responseData.data._id);
+        console.log(responseData)
+        if(!responseData.ok){
+          console.log("uiuiui")
+          throw new Error(responseData)
+        }
+      } catch (err) {
+        console.log(err.response)
+      }
     } else {
       try {
         const responseData = await sendRequest(
@@ -92,7 +99,9 @@ const Auth = () => {
         );
 
         auth.login(responseData.user.id);
-      } catch (err) {}
+      } catch (err) {
+        console.log(err)
+      }
     }
   };
 

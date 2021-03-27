@@ -15,7 +15,7 @@ const getPlaceByUser=async (req,res,next)=>{
         return next(error)
     }
     if(!identifiedPlace || identifiedPlace.length==0){
-        const error=new httpError("Couldn't Find Place for that User",401)
+        const error=new httpError("No Places Found May be Create One",401)
         return next(error)
     }
     res.status(200).json({

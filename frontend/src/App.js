@@ -19,6 +19,7 @@ const App = () => {
   const [userId, setUserId] = useState(false);
 
   const login = useCallback(uid => {
+    console.log(uid)
     setIsLoggedIn(true);
     setUserId(uid);
   }, []);
