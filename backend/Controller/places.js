@@ -2,6 +2,7 @@ const httpError=require("../Models/http-error")
 const Place=require('../Models/places')
 const {validationResult}=require("express-validator")
 const User=require('../Models/users')
+const fs=require('fs')
 const mongoose=require('mongoose')
 
 const getPlaceByUser=async (req,res,next)=>{
@@ -73,7 +74,7 @@ const createPlace=async (req,res,next)=>{
         title:title,
         description:description,
         location:location,
-        image:"https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.shutterstock.com%2Fsearch%2Fnature&psig=AOvVaw2UPOioHspiliguPXwy1UXd&ust=1616558351570000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCNjW6aTDxe8CFQAAAAAdAAAAABAD",
+        image:req.file.path,
         address:address,
         creator:creator
     })
@@ -100,7 +101,7 @@ const createPlace=async (req,res,next)=>{
     }
     catch (err){
         console.log(err)
-        const error=new httpError("Creating Placess failed, Please Try Again Later",500)
+        const error=new httpError("Created Placess failed, Please Try Again Later",500)
         return next(error)
     }
     res.status(200)
@@ -155,6 +156,7 @@ const deleteParticularPlace=async (req,res,next)=>{
         const error=new httpError("Could not Find Places",500)
         return next(error)
     }
+    const imagePath=place.image
     try{
         console.log(place);
         const sess=await mongoose.startSession();
@@ -169,6 +171,11 @@ const deleteParticularPlace=async (req,res,next)=>{
         const error=new httpError("Something went wrong, Could not Delete place",500)
         return next(error)
     }
+
+    fs.unlink(imagePath,err=>{
+        console.log(err)
+    })
+
     res.status(200).json({
         message:"Deleted Successfully",
         place:place.toObject({getters:true})

@@ -43,7 +43,7 @@ const signUp=async (req,res,next)=>{
             name,
             email,
             password,
-            image:"https://image.shutterstock.com/image-photo/mountains-under-mist-morning-amazing-260nw-1725825019.jpg",
+            image:`${req.file.path}`,
             places:[],
         })
         result=await createdUser.save();
@@ -54,7 +54,7 @@ const signUp=async (req,res,next)=>{
     }
     res.status(200).json({
         message:"User Created Successfully",
-        place:result
+        data:result
     })
 }
 const login=async (req,res,next)=>{

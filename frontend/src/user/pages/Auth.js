@@ -5,6 +5,7 @@ import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
@@ -19,7 +20,7 @@ const Auth = () => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-console.log("jkk")
+
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -39,7 +40,8 @@ console.log("jkk")
       setFormData(
         {
           ...formState.inputs,
-          name: undefined
+          name: undefined,
+          image: undefined
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -49,6 +51,10 @@ console.log("jkk")
           ...formState.inputs,
           name: {
             value: '',
+            isValid: false
+          },
+          image: {
+            value: null,
             isValid: false
           }
         },
@@ -60,7 +66,7 @@ console.log("jkk")
 
   const authSubmitHandler = async event => {
     event.preventDefault();
-    console.log(event)
+
     if (isLoginMode) {
       try {
         const responseData = await sendRequest(
@@ -74,34 +80,23 @@ console.log("jkk")
             'Content-Type': 'application/json'
           }
         );
-        auth.login(responseData.data._id);
-        console.log(responseData)
-        if(!responseData.ok){
-          console.log("uiuiui")
-          throw new Error(responseData)
-        }
-      } catch (err) {
-        console.log(err.response)
-      }
+        auth.login(responseData.user.id);
+      } catch (err) {}
     } else {
       try {
+        const formData = new FormData();
+        formData.append('email', formState.inputs.email.value);
+        formData.append('name', formState.inputs.name.value);
+        formData.append('password', formState.inputs.password.value);
+        formData.append('image', formState.inputs.image.value);
         const responseData = await sendRequest(
           'http://localhost:5000/api/users/signup',
           'POST',
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value
-          }),
-          {
-            'Content-Type': 'application/json'
-          }
+          formData
         );
 
         auth.login(responseData.user.id);
-      } catch (err) {
-        console.log(err)
-      }
+      } catch (err) {}
     }
   };
 
@@ -122,6 +117,14 @@ console.log("jkk")
               validators={[VALIDATOR_REQUIRE()]}
               errorText="Please enter a name."
               onInput={inputHandler}
+            />
+          )}
+          {!isLoginMode && (
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText="Please provide an image."
             />
           )}
           <Input

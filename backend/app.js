@@ -4,12 +4,18 @@ const bodyParser= require("body-parser");
 const userRoutes= require("./Routes/user-routes");
 const placeRoutes= require("./Routes/place-routes");
 const httpError = require("./Models/http-error");
+const fs=require('fs')
+const path=require('path')
 
 connectDb();
 
 const app=express();
 
 app.use(bodyParser.json())
+
+//static showing the image file in the browser
+
+app.use('uploads/images',express.static(path.join('uploads','images')))
 
 app.use((req,res,next)=>{
     res.setHeader("Access-Control-Allow-Origin","*");
@@ -27,7 +33,11 @@ app.use((req,res,next)=>{
 })
 
 app.use((error,req,res,next)=>{
-    console.log("Hhh")
+    if(req.file){
+        fs.unlink(req.file.path,(err)=>{
+            console.log(err)
+        })
+    }
     if(res.headerSent){
         next(error)
     }

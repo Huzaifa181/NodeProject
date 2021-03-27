@@ -1,6 +1,6 @@
 const express= require("express");
 const placeRoutes=require('../Controller/places');
-const {check}= require("express-validator");
+const {check}= require("express-validator");const {fileUpload}=require('../midllewares/file-upload')
 
 const route=express.Router();
 
@@ -15,16 +15,15 @@ route.patch('/:pid',[
 ],placeRoutes.updateParticularPlace)
 route.delete('/:pid',placeRoutes.deleteParticularPlace);
 route.get('/user/:uid',placeRoutes.getPlaceByUser);
-route.post('/',[
+route.post('/',
+    fileUpload.single('image'),
+    [
     check('title').
     not().
     isEmpty(),
     check('description').
     isLength({min:5}),
     check('address').
-    not().
-    isEmpty(),
-    check('location').
     not().
     isEmpty(),
     check('creator').
