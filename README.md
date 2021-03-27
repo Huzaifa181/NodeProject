@@ -2,7 +2,7 @@
 
 
 # NodeProject
-# This is my Node Application with full backen and front end
+# This is my Node Application with full backend and frontend
 # This includes........
 # Authentication for the user
 # Authorization for the users to access the particular Routes
