@@ -60,7 +60,7 @@ const signUp=async (req,res,next)=>{
         result=await createdUser.save();
     }
     catch(err){
-        const error=new httpError("SignUp Failjjjed,Something went Wrong",500)
+        const error=new httpError("SignUp Failed,Something went Wrong",500)
         return next(error)
     }
 
@@ -136,11 +136,10 @@ const login=async (req,res,next)=>{
     catch(err){
          const error=new httpError("Signing Up failed, Please Try Again Later")
          return next(error)
-    }   
+    }
     res.status(200).json({
         message:"LoggedIn Successfully",
         data:{userId:result._id, email:result.email,token:token, images: result.image, places:result.places}
-    
     })
 }
 exports.getAllUsers=getAllUsers

@@ -65,7 +65,7 @@ const getAllPlaces=async (req,res,next)=>{
 
 const createPlace=async (req,res,next)=>{
     const error=validationResult(req)
-    const {title,description,image,address,location,creator}=req.body
+    const {title,description,image,address,location}=req.body
     if(!error.isEmpty()){
         const error= new httpError("Invalid Input Passed, Please Check your Data",422)
         return next(error)
@@ -76,11 +76,11 @@ const createPlace=async (req,res,next)=>{
         location:location,
         image:req.file.path,
         address:address,
-        creator:creator
+        creator:req.userData.userId
     })
     let user
     try{
-        user=await User.findById(creator)
+        user=await User.findById(req.userData.userId)
     }
     catch(err){
         console.log(err)
@@ -128,6 +128,10 @@ const updateParticularPlace=async (req,res,next)=>{
     }
     place.title=title
     place.description=description
+    if(req.userData.userId!=place.creator.toString()){
+        const error=new httpError("You cannot Update this place",401)
+        return next(error)
+    }
     try{
         console.log(place);
         place=await place.save();
@@ -157,6 +161,10 @@ const deleteParticularPlace=async (req,res,next)=>{
         return next(error)
     }
     const imagePath=place.image
+    if(req.userData.userId!=place.creator.id){
+        const error=new httpError("You cannot Delete this place",401)
+        return next(error)
+    }
     try{
         console.log(place);
         const sess=await mongoose.startSession();

@@ -4,8 +4,8 @@ const bodyParser= require("body-parser");
 const userRoutes= require("./Routes/user-routes");
 const placeRoutes= require("./Routes/place-routes");
 const httpError = require("./Models/http-error");
-const fs=require('fs')
-const path=require('path')
+const fs=require('fs');
+const path=require('path');
 
 connectDb();
 

@@ -1,7 +1,7 @@
 const express= require("express");
-const userRoutes=require('../Controller/users')
+const userRoutes=require('../Controller/users');
 const {check}= require("express-validator");
-const {fileUpload}=require('../midllewares/file-upload')
+const {fileUpload}=require('../midllewares/file-upload');
 
 const route=express.Router();
 
