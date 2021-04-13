@@ -139,7 +139,7 @@ const login=async (req,res,next)=>{
     }
     res.status(200).json({
         message:"LoggedIn Successfully",
-        data:{userId:result._id, email:result.email,token:token, images: result.image, places:result.places}
+        data:{userId:existingUser._id, email:existingUser.email,token:token, images: existingUser.image, places:existingUser.places}
     })
 }
 exports.getAllUsers=getAllUsers
