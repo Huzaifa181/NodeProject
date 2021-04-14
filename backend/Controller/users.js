@@ -66,7 +66,7 @@ const signUp=async (req,res,next)=>{
 
     let token;
     try{
-        jwt.sign({
+        token=jwt.sign({
             userId:result._id,
             email:result.email
         },
@@ -123,7 +123,7 @@ const login=async (req,res,next)=>{
     }
     let token;
     try{
-        jwt.sign({
+        token=jwt.sign({
             userId:existingUser._id,
             email:existingUser.email
         },
